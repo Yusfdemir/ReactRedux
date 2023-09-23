@@ -5,35 +5,35 @@ export const noteSlice=createSlice({
     name:'noteApp',
     initialState:{
         notes:[
-            {note:"note1",color:"primary",id:nanoid()},
-            {note:"note2",color:"danger",id:nanoid()},
-            {note:"note3",color:"success",id:nanoid()},
-            {note:"note4",color:"warning",id:nanoid()},
-            {note:"note5",color:"secondary",id:nanoid()},
-        ],
-        color:"primary"
+            {note:"aaaa",color:"primary",id:nanoid()},
+            {note:"bbbb",color:"danger",id:nanoid()},
+            {note:"cccc",color:"success",id:nanoid()},
+            {note:"note1",color:"warning",id:nanoid()},
+            {note:"note2",color:"secondary",id:nanoid()},
+        ],   
     },
     reducers:{
-        selectColor:(state,action)=>{
-           state.color=action.payload
-        },
         addNote:{
             reducer:(state,action)=>{
                 state.notes.push(action.payload)
             },
-            prepare:({note})=>{
-                
+            prepare:({note,selectedColor})=>{
                 return{
                     payload:{
                         id:nanoid(),
-                        //color:state.color,
+                        color:selectedColor,
                         note
                     }
                 }
             }
+        },
+        deleteNote:(state,action)=>{
+            const id=action.payload;
+            const filtered=state.notes.filter(note=>note.id !== id)
+            state.notes=filtered
         }
     }
 })
 
-export const {selectColor,addNote}=noteSlice.actions
+export const {addNote,deleteNote}=noteSlice.actions
 export default noteSlice.reducer

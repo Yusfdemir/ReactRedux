@@ -1,33 +1,40 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {Row,Col,InputGroup,Form, Button, } from 'react-bootstrap'
 import {useSelector,useDispatch} from 'react-redux'
-import {AiOutlineCheck} from "react-icons/ai"
-import {selectColor,addNote} from "../redux/Note/noteSlice"
+import {AiOutlineCheck,AiOutlineDelete} from "react-icons/ai"
+import {addNote,deleteNote} from "../redux/Note/noteSlice"
  
 const TextArea = () => {
     const dispatch =useDispatch();
     const notes=useSelector((state)=>state.noteApp.notes)
-    const selectedColor=useSelector((state)=>state.noteApp.color)
     const colors=['primary','danger','warning','success','secondary']
     const [note,setNote]=useState("")
+    const [selectedColor,setSelectedColor]=useState(localStorage.getItem("selectedColor")||"white")
+    const [search,setSearch]=useState("")
 
     const handleSubmit=(e)=>{
         e.preventDefault();
         if(!note) return;
-        dispatch(addNote({note}))
+        dispatch(addNote({note,selectedColor}))
         setNote("")
     }
+    useEffect(()=>{
+        localStorage.setItem("selectedColor",selectedColor)
+    },[selectedColor])
+    let filteredNotes=notes.filter(note=>note.note.toLowerCase().includes(search.toLowerCase()))
+
   return (
     <>
     <h2 className='text-center text-secondary'>Notes App</h2>
     <Row className='justify-content-center p-3'>
         <Col xs={12} md={8}  className='d-flex justify-content-center'>
-            <InputGroup  className="mb-3 w-75">
+            <InputGroup  className="mb-3 w-75" >
                 <InputGroup.Text id="basic-addon1">Search</InputGroup.Text>
                 <Form.Control
                 placeholder="..."
                 aria-label="Search"
-                aria-describedby="basic-addon1"
+                value={search}
+                onChange={(e)=>{setSearch(e.target.value)}}
                 />
             </InputGroup>
         </Col>
@@ -47,13 +54,12 @@ const TextArea = () => {
                         {
                             colors?.map((color,index)=>(
                                 <Button key={index}
-                                        value={color} 
-                                        className={`rounded-circle bg-${color} border-0 mx-1  ` }
-                                        style={{width:"25px",height:"25px"}}
-                                        onClick={()=>dispatch(selectColor(color))}
+                                        className={`rounded-circle bg-${color} border-0 mx-1 d-flex justify-content-center align-items-center` }
+                                        style={{width:"35px",height:"35px"}}
+                                        onClick={()=>setSelectedColor(color)}
                                         >
                                     {
-                                        color===selectedColor && <AiOutlineCheck color='black' className='d-flex' /> 
+                                        color===selectedColor && <AiOutlineCheck color='black'/> 
                                     }
                                 </Button>
                             ))
@@ -70,12 +76,17 @@ const TextArea = () => {
 
             <Col xs={12} md={8} className='mt-4' >
                 <Row>
-                {
-                    notes?.map((note,index)=>(
+                {   filteredNotes.length>0 ?
+                    filteredNotes.map((note,index)=>(
                         <Col key={index} xs={12} md={6} lg={4} className='my-2'>
-                            <div className={`w-90 d-flex justify-content-center bg-${note.color}`}>{note.note}</div>    
+                            <div className={`w-90 d-flex justify-content-between bg-${note.color}`}>
+                                <p className='p-1 fw-semibold'>{note.note}</p>
+                                <button className='bg-transparent border-0' onClick={()=>dispatch(deleteNote(note.id))}><AiOutlineDelete/></button>
+                            </div>    
                         </Col>
                     ))
+                    :
+                    <div className='text-center fw-bold'>Sonuç bulunamadı</div>
                 }
                 </Row>
             </Col>
