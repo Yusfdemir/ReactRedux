@@ -1,0 +1,11 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+body{
+    background-color: #f1f2f6;
+}
+:root{
+    margin:0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+}
